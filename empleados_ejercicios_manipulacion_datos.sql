@@ -48,10 +48,11 @@ INSERT INTO empleado VALUES(13, '82635162B', 'Juan Antonio','Sáez', 'Guerrero',
 #
 # 01.- Inserta un nuevo departamento indicando su código, nombre y presupuesto.
 use empleados;
-insert into departamento (id, nombre, presupuesto, gastos) values (8, 'Seguridad', 0, 0);
+insert into departamento (id, nombre, presupuesto, gastos) values (8, 'Seguridad', 0, 0); # ponemos el código porque queremos porque como AUTO INCREMENT; ventaja: si lo intento ejecutar dos veces no me va a dejar
 
 # 02.- Inserta un nuevo departamento indicando su nombre y presupuesto.
-insert into departamento ( nombre, presupuesto, gastos) values ('El ministerio del tiempo', 0, 0);
+insert into departamento ( nombre, presupuesto, gastos) values ('El ministerio del tiempo', 0, 0); # no hace falta el id porque se va a autoincrementar; problema; puedo meter n veces los mismos datos sin darme cuenta, aparecerán repetidos pero con claves distintas
+
 #
 # 03.- Inserta un nuevo departamento indicando su código, nombre, presupuesto y gastos.
 insert into departamento ( id, nombre, presupuesto, gastos) values (10, 'Pepito', 100000, 0);
@@ -89,9 +90,14 @@ where nombre = 'Proyectos';
 # );
 #
 # 09.- Actualiza el código del departamento Recursos Humanos y asígnale el valor 30. ¿Es posible actualizarlo? Si no fuese posible, ¿qué cambios debería realizar para que fuese actualizarlo?
-#
+update departamento set id = 30 where nombre = 'Recursos Humanos';
+
 # 10.- Actualiza el código del departamento Publicidad y asígnale el valor 40. ¿Es posible actualizarlo? Si no fuese posible, ¿qué cambios debería realizar para que fuese actualizarlo?
-#
+update departamento set id = 40 where nombre = 'Publicidad';
+
 # 11.- Actualiza el presupuesto de los departamentos sumándole 50000 € al valor del presupuesto actual, solamente a aquellos departamentos que tienen un presupuesto menor que 20000 €.
-#
+ update departamento set presupuesto = presupuesto + 50000 where presupuesto < 20000;
+
+
 # 12.- Realiza una transacción que elimine todas los empleados que no tienen un departamento asociado.
+# NO ENTRA
