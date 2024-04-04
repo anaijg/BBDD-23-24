@@ -49,6 +49,7 @@ INSERT INTO empleado VALUES(13, '82635162B', 'Juan Antonio','Sáez', 'Guerrero',
 # 01.- Inserta un nuevo departamento indicando su código, nombre y presupuesto.
 use empleados;
 insert into departamento (id, nombre, presupuesto, gastos) values (8, 'Seguridad', 0, 0); # ponemos el código porque queremos porque como AUTO INCREMENT; ventaja: si lo intento ejecutar dos veces no me va a dejar
+# metemos gastos = 0 porque es campo es not null
 
 # 02.- Inserta un nuevo departamento indicando su nombre y presupuesto.
 insert into departamento ( nombre, presupuesto, gastos) values ('El ministerio del tiempo', 0, 0); # no hace falta el id porque se va a autoincrementar; problema; puedo meter n veces los mismos datos sin darme cuenta, aparecerán repetidos pero con claves distintas
@@ -56,11 +57,13 @@ insert into departamento ( nombre, presupuesto, gastos) values ('El ministerio d
 #
 # 03.- Inserta un nuevo departamento indicando su código, nombre, presupuesto y gastos.
 insert into departamento ( id, nombre, presupuesto, gastos) values (10, 'Pepito', 100000, 0);
+
 # 04.- Inserta un nuevo empleado asociado a uno de los nuevos departamentos. La sentencia de inserción debe incluir: código, nif, nombre, apellido1, apellido2 y codigo_departamento.
 insert into empleado (id, nif, nombre, apellido1, apellido2, id_departamento) values (14, '01234567B', 'Maria', 'de las Mercedes', 'Reina', 10);
 
 # 05.- Inserta un nuevo empleado asociado a uno de los nuevos departamentos. La sentencia de inserción debe incluir: nif, nombre, apellido1, apellido2 y codigo_departamento.
 insert into empleado (nif, nombre, apellido1, apellido2, id_departamento) values ('01234567C', 'Maria', 'de las Mercedes', 'Reina', 10);
+
 # 06.- Crea una nueva tabla con el nombre departamento_backup que tenga las mismas columnas que la tabla departamento.
 create table departamento_backup(
       id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -97,6 +100,7 @@ update departamento set id = 40 where nombre = 'Publicidad';
 
 # 11.- Actualiza el presupuesto de los departamentos sumándole 50000 € al valor del presupuesto actual, solamente a aquellos departamentos que tienen un presupuesto menor que 20000 €.
  update departamento set presupuesto = presupuesto + 50000 where presupuesto < 20000;
+
 
 
 # 12.- Realiza una transacción que elimine todas los empleados que no tienen un departamento asociado.
