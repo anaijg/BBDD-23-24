@@ -1,0 +1,86 @@
+Bases de datos tema 5 
+======================
+https://josejuansanchez.org/bd/unidad-11-teoria/index.html
+INSERT
+INSERT + SELECT
+UPDATE
+	(SI FK)... ON UPDATE CASCADE
+	
+	UPDATE table
+	SET campo1 = valor1, campo2 = valor2..
+	[WHERE condición];
+	
+DELETE
+	(SI FK)... ON DELETE CASCADE
+ejercicios prácticos: tienda, empleados, jardinería
+
+Vistas, usuarios y privilegios:
+libro Garceta, de la página 203 a la 212
+
+
+EXAMEN BBDD UNIDAD 5
+====================
+Modificación de datos: 
+======================
+INSERT:
+-------
+	forma larga:
+		INSERT INTO tabla (campo1, campo2...) 
+		VALUES (valor1, valor2,...);
+
+	forma corta: 
+		INSERT INTO tabla 
+		VALUES (valor1, valor2,...);
+
+con select: para meter un grupo de registros
+	INSERT INTO (...) 
+	SELECT ....
+
+	NOTAS: 
+		* Con/sin auto-increment
+
+UPDATE
+------
+	UPDATE tabla
+	SET campo1 = valor1, campo2 = valor2..
+	WHERE condición
+
+DELETE
+------
+DELETE FROM tabla
+WHERE condición
+
+
+Usuarios y privilegios:
+=======================
+* Crear usuario: create user nombre_usuario
+				 identified by 'password';
+* Modificar usuarios: UPDATE mysql.user 
+					  set campo1 = valor1,...
+					  WHERE condición
+* Eliminar usuario: DROP user usuario;
+
+* Renombrar usuario: RENAME USER usuario TO nuevo_nombre
+
+* Cambiar contraseña: ALTER USER usuario IDENTIFIED BY 'nueva_contraseña';
+
+* GRANT ALL PRIVILEGES ON base_de_datos.tabla TO usuario			  
+
+* REVOKE tipo_privilegio
+ON base_de_datos.tabla
+FROM nombre_usuario@host;
+
+VISTAS: 
+=======
+CREATE VIEW nombre_vista AS
+SELECT...;
+
+DROP VIEW nombre_vista;
+
+
+De DDL:
+=======
+* Crear una tabla
+* Añadir campos a una tabla
+* Eliminar y añadir restricciones
+
