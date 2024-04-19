@@ -188,13 +188,276 @@ end $$;
     SELECT @dia;
 
 # 1.8.2 Procedimientos con sentencias SQL
+# Ejercicio 9
 # Escribe un procedimiento que reciba el nombre de un país como parámetro de entrada y realice una consulta sobre la tabla cliente para obtener todos los clientes que existen en la tabla de ese país.
-#
+DELIMITER $$;
+DROP PROCEDURE IF EXISTS ejercicio_9;
+CREATE PROCEDURE ejercicio_9(IN pais_cliente varchar(50))
+BEGIN
+    SELECT *
+    FROM cliente
+    WHERE pais = pais_cliente;
+end $$;
+
+DELIMITER ;
+CALL ejercicio_9('USA');
+
+
+# Ejercicio 10
 # Escribe un procedimiento que reciba como parámetro de entrada una forma de pago, que será una cadena de caracteres (Ejemplo: PayPal, Transferencia, etc). Y devuelva como salida el pago de máximo valor realizado para esa forma de pago. Deberá hacer uso de la tabla pago de la base de datos jardineria.
-#
+DELIMITER $$;
+DROP PROCEDURE IF EXISTS ejercicio_10;
+CREATE PROCEDURE ejercicio_10(IN forma_de_pago varchar(20), OUT pago_maximo double)
+BEGIN
+    SET pago_maximo = (SELECT MAX(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+end $$;
+
+DELIMITER ;
+CALL ejercicio_10('Transferencia', @maximo);
+SELECT @maximo AS max_transferencia;
+CALL ejercicio_10('Cheque', @maximo);
+SELECT @maximo AS max_cheque;
+CALL ejercicio_10('PayPal', @maximo);
+SELECT @maximo AS max_PayPal;
+
+
+
+# Ejercicio 11
 # Escribe un procedimiento que reciba como parámetro de entrada una forma de pago, que será una cadena de caracteres (Ejemplo: PayPal, Transferencia, etc). Y devuelva como salida los siguientes valores teniendo en cuenta la forma de pago seleccionada como parámetro de entrada:
 # el pago de máximo valor,
 # el pago de mínimo valor,
 # el valor medio de los pagos realizados,
 # la suma de todos los pagos,
 # el número de pagos realizados para esa forma de pago
+
+DELIMITER $$;
+DROP PROCEDURE IF EXISTS ejercicio_11;
+CREATE PROCEDURE ejercicio_11(IN forma_de_pago varchar(20),
+                              OUT pago_maximo double,
+                              OUT pago_minimo double,
+                              OUT pago_medio double,
+                              OUT suma_pagos double,
+                              OUT numero_pagos int)
+BEGIN
+    SET pago_maximo = (SELECT MAX(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+
+    SET pago_minimo = (SELECT MIN(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+
+    SET pago_medio = (SELECT AVG(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+
+    SET suma_pagos = (SELECT SUM(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+
+    SET numero_pagos = (SELECT COUNT(total)
+                       FROM pago
+                       WHERE forma_pago = forma_de_pago);
+end $$;
+
+DELIMITER ;
+CALL ejercicio_11('Transferencia', @maximo, @minimo, @medio, @suma, @cuenta);
+SELECT @maximo, @minimo, @medio, @suma, @cuenta;
+
+CALL ejercicio_11('Cheque', @maximo, @minimo, @medio, @suma, @cuenta);
+SELECT @maximo, @minimo, @medio, @suma, @cuenta;
+
+CALL ejercicio_11('PayPal', @maximo, @minimo, @medio, @suma, @cuenta);
+SELECT @maximo, @minimo, @medio, @suma, @cuenta;
+
+# EJERCICIO 12
+# Crea una base de datos llamada procedimientos que contenga una tabla llamada cuadrados.
+# La tabla cuadrados debe tener dos columnas de tipo INT UNSIGNED, una columna llamada número y otra columna llamada cuadrado.
+    DROP DATABASE IF EXISTS procedimientos;
+    CREATE DATABASE procedimientos;
+    USE procedimientos;
+    CREATE TABLE cuadrados(
+        numero INT UNSIGNED,
+        cuadrado INT UNSIGNED
+    );
+
+
+# Una vez creada la base de datos y la tabla deberá crear un procedimiento llamado calcular_cuadrados con las siguientes características.
+# El procedimiento recibe un parámetro de entrada llamado n de tipo INT UNSIGNED y calculará el valor de los cuadrados de los primeros números naturales hasta el valor introducido como parámetro.
+# El valor del número y de su cuadrado deberá ser almacenados en la tabla cuadrados que hemos creado previamente.
+# Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de la tabla antes de insertar los nuevos valores de los cuadrados que va a calcular.
+# Utilice un bucle WHILE para resolver el procedimiento.
+
+    USE procedimientos;
+DELIMITER $$;
+DROP PROCEDURE  IF EXISTS calcular_cuadrados;
+CREATE PROCEDURE calcular_cuadrados(IN n INT UNSIGNED)
+BEGIN
+    # DECLARAMOS VARIABLES
+    DECLARE cuadrado INT;
+    DECLARE i INT;
+
+    # INICIALIZAMOS LO QUE HAGA FALTA
+    SET i = 1;
+
+    # SI HUBIERA ALGO EN LA TABLA, LO ELIMINO
+    TRUNCATE cuadrados;
+
+    # y ahora el while
+    WHILE i <= n DO
+        SET cuadrado = i * i;
+
+        INSERT INTO cuadrados VALUES (i, cuadrado);
+
+        SET i = i + 1;
+    end while;
+end $$;
+
+DELIMITER ;
+CALL calcular_cuadrados(4);
+
+# Ejercicio 13
+# Utilice un bucle REPEAT para resolver el procedimiento del ejercicio anterior.
+
+USE procedimientos;
+DELIMITER $$;
+DROP PROCEDURE  IF EXISTS calcular_cuadrados_repeat_until;
+CREATE PROCEDURE calcular_cuadrados_repeat_until(IN n INT UNSIGNED)
+BEGIN
+    # DECLARAMOS VARIABLES
+    DECLARE cuadrado INT;
+    DECLARE i INT;
+
+    # INICIALIZAMOS LO QUE HAGA FALTA
+    SET i = 1;
+
+    # SI HUBIERA ALGO EN LA TABLA, LO ELIMINO
+    TRUNCATE cuadrados;
+
+    # y ahora el repeat.. until
+    REPEAT -- REPETIR
+        SET cuadrado = i * i;
+
+        INSERT INTO cuadrados VALUES (i, cuadrado);
+
+        SET i = i + 1;
+    until i > n -- HASTA QUE i SEA MAYOR QUE n; es decir, que si n = 5, salimos cuando i = 6 (6 >5 )
+    end repeat;
+
+end $$;
+
+DELIMITER ;
+CALL calcular_cuadrados_repeat_until(25);
+
+
+# Ejercicio 14
+# Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
+
+# Ejercicio 15
+# Crea una base de datos llamada procedimientos -> NONONONONO. Añade una tabla a la que tienes.
+# que contenga una tabla llamada ejercicio. La tabla debe tener una única columna llamada número y el tipo de dato de esta columna debe ser INT UNSIGNED.
+    USE procedimientos;
+    CREATE TABLE ejercicio(
+        numero INT UNSIGNED
+    );
+
+# Una vez creada la base de datos y la tabla deberá crear un procedimiento llamado calcular_números_while con las siguientes características.
+# Utilice un bucle WHILE para resolver el procedimiento.
+    DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_números_while;
+    CREATE PROCEDURE calcular_números_while(IN valor_inicial INT UNSIGNED) # El procedimiento recibe un parámetro de entrada llamado valor_inicial de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = valor_inicial;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de la tabla antes de insertar los nuevos valores.
+        TRUNCATE ejercicio;
+        # y deberá almacenar en la tabla ejercicio toda la secuencia de números desde el valor inicial pasado como entrada hasta el 1.
+        # ejemplo: valor_inicial = 5 entonces tiene que guardar, en este orden: 5, 4, 3, 2, 1
+        WHILE i >= 1 DO
+            INSERT INTO ejercicio VALUES (i);
+            SET i = i - 1;
+        end while ;
+    end $$;
+
+DELIMITER ;
+CALL calcular_números_while(15);
+
+# # Ejercicio 16
+# # Utilice un bucle REPEAT para resolver el procedimiento del ejercicio anterior.
+    DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_números_while;
+    CREATE PROCEDURE calcular_números_while(IN valor_inicial INT UNSIGNED) # El procedimiento recibe un parámetro de entrada llamado valor_inicial de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = valor_inicial;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de la tabla antes de insertar los nuevos valores.
+        TRUNCATE ejercicio;
+        # y deberá almacenar en la tabla ejercicio toda la secuencia de números desde el valor inicial pasado como entrada hasta el 1.
+        # ejemplo: valor_inicial = 5 entonces tiene que guardar, en este orden: 5, 4, 3, 2, 1
+        WHILE i >= 1 DO
+            INSERT INTO ejercicio VALUES (i);
+            SET i = i - 1;
+        end while ;
+    end $$;
+
+DELIMITER ;
+CALL calcular_números_while(15);
+
+
+# # Ejercicio 17
+# # Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
+
+
+
+
+# Ejercicio 18
+# Crea una base de datos llamada procedimientos ->  NONONONONO. Añade una tabla a la que tienes.
+# que contenga una tabla llamada pares y otra tabla llamada impares.
+# Las dos tablas deben tener única columna llamada número y el tipo de dato de esta columna debe ser INT UNSIGNED.
+    USE procedimientos;
+    CREATE TABLE pares(
+        numero INT UNSIGNED
+    );
+    CREATE TABLE impares(
+        numero INT UNSIGNED
+    );
+
+# Una vez creada la base de datos y las tablas deberá crear un procedimiento llamado calcular_pares_impares_while con las siguientes características.
+# Utilice un bucle WHILE para resolver el procedimiento.
+
+    DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_pares_impares_while;
+    CREATE PROCEDURE calcular_pares_impares_while(IN tope INT UNSIGNED) #  El procedimiento recibe un parámetro de entrada llamado tope de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = 1;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de las tablas antes de insertar los nuevos valores.
+        TRUNCATE pares;
+        TRUNCATE impares;
+        # y deberá almacenar en la tabla pares aquellos números pares que existan entre el número 1 el valor introducido como parámetro.
+# Habrá que realizar la misma operación para almacenar los números impares en la tabla impares.
+
+# Ejemplo: 15 -> 1 va a impares, 2 va a pares, 3 -> impares,...., 15 -> impares
+        WHILE i <= tope DO
+
+            IF i % 2 = 0 THEN INSERT INTO pares VALUES (i);
+            ELSE insert into impares values (i);
+            end if;
+
+            SET i = i + 1;
+        end while;
+
+    end $$;
+
+DELIMITER ;
+CALL calcular_pares_impares_while(15);
+
+# # Ejercicio 19
+# # Utilice un bucle REPEAT para resolver el procedimiento del ejercicio anterior.
+
+
+
+# # Ejercicio 20
+# # Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
