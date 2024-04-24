@@ -387,8 +387,8 @@ CALL calcular_números_while(15);
 # # Ejercicio 16
 # # Utilice un bucle REPEAT para resolver el procedimiento del ejercicio anterior.
     DELIMITER $$;
-    DROP PROCEDURE IF EXISTS calcular_números_while;
-    CREATE PROCEDURE calcular_números_while(IN valor_inicial INT UNSIGNED) # El procedimiento recibe un parámetro de entrada llamado valor_inicial de tipo INT UNSIGNED
+    DROP PROCEDURE IF EXISTS calcular_números_repeat;
+    CREATE PROCEDURE calcular_números_repeat(IN valor_inicial INT UNSIGNED) # El procedimiento recibe un parámetro de entrada llamado valor_inicial de tipo INT UNSIGNED
     BEGIN
         DECLARE i INT;
         SET i = valor_inicial;
@@ -396,14 +396,16 @@ CALL calcular_números_while(15);
         TRUNCATE ejercicio;
         # y deberá almacenar en la tabla ejercicio toda la secuencia de números desde el valor inicial pasado como entrada hasta el 1.
         # ejemplo: valor_inicial = 5 entonces tiene que guardar, en este orden: 5, 4, 3, 2, 1
-        WHILE i >= 1 DO
+        REPEAT
+          -- instrucciones  a repetir (una de las cuales siempre es cambiar la i)
             INSERT INTO ejercicio VALUES (i);
             SET i = i - 1;
-        end while ;
+        until  i < 1 -- lo contrario de la condición while, esto es, el primer valor en "el que te sales"
+            end repeat;
     end $$;
 
 DELIMITER ;
-CALL calcular_números_while(15);
+CALL calcular_números_repeat(9);
 
 
 # # Ejercicio 17
@@ -456,6 +458,31 @@ CALL calcular_pares_impares_while(15);
 
 # # Ejercicio 19
 # # Utilice un bucle REPEAT para resolver el procedimiento del ejercicio anterior.
+DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_pares_impares_repeat;
+    CREATE PROCEDURE calcular_pares_impares_repeat(IN tope INT UNSIGNED) #  El procedimiento recibe un parámetro de entrada llamado tope de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = 1;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de las tablas antes de insertar los nuevos valores.
+        TRUNCATE pares;
+        TRUNCATE impares;
+        # y deberá almacenar en la tabla pares aquellos números pares que existan entre el número 1 el valor introducido como parámetro.
+# Habrá que realizar la misma operación para almacenar los números impares en la tabla impares.
+
+# Ejemplo: 15 -> 1 va a impares, 2 va a pares, 3 -> impares,...., 15 -> impares
+        REPEAT
+            IF i % 2 = 0 THEN INSERT INTO pares VALUES (i);
+            ELSE insert into impares values (i);
+            end if;
+
+            SET i = i + 1;
+        until i > tope
+            end repeat;
+end $$;
+
+DELIMITER ;
+CALL calcular_pares_impares_repeat(34);
 
 
 

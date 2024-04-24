@@ -76,3 +76,40 @@ end $$;
 delimiter ;
 call ejemplo_repeat_until(1000, @resultado);
 SELECT @resultado
+
+
+
+
+
+# nombre_bucle: LOOP
+# 	IF condicion_de_salida THEN
+# 		LEAVE nombre_bucle;
+# 	END IF;
+# 		instrucciones _a_ repetir
+# END LOOP;
+
+# Ejemplo: crear un procedimiento que realice la suma de todos los números enteros desde 1 hasta un número introducido por parámetro (inclusive).
+USE procedimientos;
+DELIMITER $$;
+DROP PROCEDURE IF EXISTS ejemplo_bucle_loop;
+CREATE PROCEDURE ejemplo_bucle_loop(IN tope INT, OUT suma INT)
+BEGIN
+   DECLARE i INT;
+
+   SET i = 1;
+   SET suma = 0;
+
+   bucle: LOOP
+     IF i > tope THEN -- esto funciona igual que en repeat until; pones el primer valor "en que te sales"
+       LEAVE bucle;
+     END IF;
+
+    -- instrucciones a repetir
+     SET suma = suma + i;
+     SET i = i + 1;
+   END LOOP;
+END $$;
+
+ DELIMITER ;
+ CALL ejemplo_bucle_loop(6, @resultado);
+ SELECT @resultado;
