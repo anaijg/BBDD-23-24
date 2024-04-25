@@ -354,6 +354,37 @@ CALL calcular_cuadrados_repeat_until(25);
 
 # Ejercicio 14
 # Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
+USE procedimientos;
+DELIMITER $$;
+DROP PROCEDURE  IF EXISTS calcular_cuadrados_repeat_loop;
+CREATE PROCEDURE calcular_cuadrados_repeat_loop(IN n INT UNSIGNED)
+BEGIN
+    # DECLARAMOS VARIABLES
+    DECLARE cuadrado INT;
+    DECLARE i INT;
+
+    # INICIALIZAMOS LO QUE HAGA FALTA
+    SET i = 1;
+
+    # SI HUBIERA ALGO EN LA TABLA, LO ELIMINO
+    TRUNCATE cuadrados;
+
+    # y ahora el loop
+    bucle: LOOP
+        IF i > n THEN -- HASTA QUE i SEA MAYOR QUE n; es decir, que si n = 5, salimos cuando i = 6 (6 >5 )
+            LEAVE bucle;
+        end if;
+
+        SET cuadrado = i * i;
+        INSERT INTO cuadrados VALUES (i, cuadrado);
+        SET i = i + 1;
+
+    end loop;
+end $$;
+
+DELIMITER ;
+CALL calcular_cuadrados_repeat_loop(18);
+
 
 # Ejercicio 15
 # Crea una base de datos llamada procedimientos -> NONONONONO. Añade una tabla a la que tienes.
@@ -411,7 +442,30 @@ CALL calcular_números_repeat(9);
 # # Ejercicio 17
 # # Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
 
+    DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_números_loop;
+    CREATE PROCEDURE calcular_números_loop(IN valor_inicial INT UNSIGNED) # El procedimiento recibe un parámetro de entrada llamado valor_inicial de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = valor_inicial;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de la tabla antes de insertar los nuevos valores.
+        TRUNCATE ejercicio;
+        # y deberá almacenar en la tabla ejercicio toda la secuencia de números desde el valor inicial pasado como entrada hasta el 1.
+        # ejemplo: valor_inicial = 5 entonces tiene que guardar, en este orden: 5, 4, 3, 2, 1
+        bucle: LOOP
+            IF i < 1 THEN
+                LEAVE bucle;
+            end if ;
 
+        -- instrucciones  a repetir (una de las cuales siempre es cambiar la i)
+            INSERT INTO ejercicio VALUES (i);
+            SET i = i - 1;
+
+        end loop ;
+    end $$;
+
+DELIMITER ;
+CALL calcular_números_loop(5);
 
 
 # Ejercicio 18
@@ -488,3 +542,98 @@ CALL calcular_pares_impares_repeat(34);
 
 # # Ejercicio 20
 # # Utilice un bucle LOOP para resolver el procedimiento del ejercicio anterior.
+
+DELIMITER $$;
+    DROP PROCEDURE IF EXISTS calcular_pares_impares_loop;
+    CREATE PROCEDURE calcular_pares_impares_loop(IN tope INT UNSIGNED) #  El procedimiento recibe un parámetro de entrada llamado tope de tipo INT UNSIGNED
+    BEGIN
+        DECLARE i INT;
+        SET i = 1;
+        # Tenga en cuenta que el procedimiento deberá eliminar el contenido actual de las tablas antes de insertar los nuevos valores.
+        TRUNCATE pares;
+        TRUNCATE impares;
+        # y deberá almacenar en la tabla pares aquellos números pares que existan entre el número 1 el valor introducido como parámetro.
+# Habrá que realizar la misma operación para almacenar los números impares en la tabla impares.
+
+# Ejemplo: 15 -> 1 va a impares, 2 va a pares, 3 -> impares,...., 15 -> impares
+            bucle: LOOP
+                IF i > tope THEN
+                    LEAVE bucle;
+                end if;
+
+            IF i % 2 = 0 THEN INSERT INTO pares VALUES (i);
+            ELSE insert into impares values (i);
+            end if;
+
+            SET i = i + 1;
+
+            end loop;
+
+end $$;
+
+DELIMITER ;
+CALL calcular_pares_impares_loop(13);
+
+# 1.8.3 Funciones sin sentencias SQL -> NO SQL
+# EJERCICIO 21
+# Escribe una función que reciba un número entero de entrada y devuelva TRUE si el número es par o FALSE en caso contrario.
+DELIMITER $$;
+DROP FUNCTION IF EXISTS es_par;
+CREATE FUNCTION es_par(numero INT)
+RETURNS BOOLEAN
+NO SQL
+BEGIN
+
+    IF numero % 2 = 0 THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    end if;
+
+end $$;
+
+SELECT es_par(20);
+SELECT es_par(21);
+
+# EJERCICIO 22
+# Escribe una función que devuelva el valor de la hipotenusa de un triángulo a partir de los valores de sus lados.
+
+
+
+
+# EJERCICIO 23
+# Escribe una función que reciba como parámetro de entrada un valor numérico que represente un día de la semana y que devuelva una cadena de caracteres con el nombre del día de la semana correspondiente. Por ejemplo, para el valor de entrada 1 debería devolver la cadena lunes.
+
+# EJERCICIO 24
+# Escribe una función que reciba tres números reales como parámetros de entrada y devuelva el mayor de los tres.
+
+# EJERCICIO 25
+# Escribe una función que devuelva el valor del área de un círculo a partir del valor del radio que se recibirá como parámetro de entrada.
+
+# EJERCICIO 26
+# Escribe una función que devuelva como salida el número de años que han transcurrido entre dos fechas que se reciben como parámetros de entrada. Por ejemplo, si pasamos como parámetros de entrada las fechas 2018-01-01 y 2008-01-01 la función tiene que devolver que han pasado 10 años.
+# Para realizar esta función puede hacer uso de las siguientes funciones que nos proporciona MySQL:
+# DATEDIFF
+# TRUNCATE
+
+
+# EJERCICIO 27
+# Escribe una función que reciba una cadena de entrada y devuelva la misma cadena pero sin acentos. La función tendrá que reemplazar todas las vocales que tengan acento por la misma vocal pero sin acento. Por ejemplo, si la función recibe como parámetro de entrada la cadena María la función debe devolver la cadena Maria.
+
+
+# 1.8.4 Funciones con sentencias SQL READS SQL DATA / MODIFIES SQL DATA
+
+# EJERCICIO 28
+# Escribe una función para la base de datos tienda que devuelva el número total de productos que hay en la tabla productos.
+
+# EJERCICIO 29
+# Escribe una función para la base de datos tienda que devuelva el valor medio del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+
+# EJERCICIO 30
+# Escribe una función para la base de datos tienda que devuelva el valor máximo del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+
+# EJERCICIO 31
+# Escribe una función para la base de datos tienda que devuelva el valor mínimo del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+
+
+

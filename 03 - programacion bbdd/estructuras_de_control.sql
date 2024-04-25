@@ -113,3 +113,42 @@ END $$;
  DELIMITER ;
  CALL ejemplo_bucle_loop(6, @resultado);
  SELECT @resultado;
+
+
+#### funciones #####
+# DELIMITER $$;
+# DROP FUNCTION IF EXISTS nombre_funcion;
+# CREATE FUNCTION nombre_funcion([nombre_param1 tipo][, nombre_param2 tipo]...)
+#   RETURNS tipo_valor_devuelto
+    # NO SQL | READS SQL DATA | MODIFIES SQL DATA....
+
+#   ...
+# BEGIN
+#   … instrucciones…
+#
+#
+#   RETURN valor_devuelto;
+# END $$;
+# DELIMITER;
+
+# EJEMPLO FUNCION
+# Crear una función que devuelva el número de productos que hay en la tabla producto de una gama metida por parámetro
+USE jardineria;
+DELIMITER $$;
+DROP FUNCTION IF EXISTS ejemplo_funcion_contar_productos;
+CREATE FUNCTION ejemplo_funcion_contar_productos(gama_producto VARCHAR(50))
+RETURNS INT UNSIGNED -- DEVUELVE UN ENTERO NO NEGATIVO
+    READS SQL DATA
+    BEGIN
+
+        DECLARE numero_productos INT UNSIGNED;
+
+        SET numero_productos = (SELECT COUNT(*)
+        FROM producto
+        WHERE gama = gama_producto);
+
+        RETURN numero_productos;
+end $$;
+
+DELIMITER ;
+SELECT ejemplo_funcion_contar_productos('Herramientas');
