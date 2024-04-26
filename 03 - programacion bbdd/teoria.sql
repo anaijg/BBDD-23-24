@@ -152,3 +152,88 @@ end $$;
 
 DELIMITER ;
 SELECT ejemplo_funcion_contar_productos('Herramientas');
+
+## TRIGGERS ###
+# DELIMITER $$;
+# DROP TRIGGER IF EXISTS trigger_name;
+# CREATE TRIGGER trigger_name
+#     { BEFORE | AFTER } { INSERT | UPDATE | DELETE }
+#     ON tbl_name FOR EACH ROW
+#     BEGIN
+# 	instrucciones, usando NEW para el nuevo dato
+
+#     END $$;
+# Un trigger es un objeto de la base de datos que está asociado con una tabla y que se activa cuando ocurre un evento  (insert, update o delete)sobre la tabla.
+
+# Ejemplo:
+# Crea una base de datos llamada test que contenga una tabla llamada alumnos con las siguientes columnas.
+# Tabla alumnos:
+# id (entero sin signo)
+# nombre (cadena de caracteres)
+# apellido1 (cadena de caracteres)
+# apellido2 (cadena de caracteres)
+# nota (número real)
+    DROP DATABASE IF EXISTS test;
+    CREATE DATABASE test;
+    USE test;
+    CREATE TABLE alumnos(
+        id INT UNSIGNED,
+        nombre VARCHAR(100),
+        apellido1 VARCHAR(100),
+        apellido2 VARCHAR(100),
+        nota DECIMAL(4,2)
+    );
+
+# Una vez creada la tabla escriba dos triggers con las siguientes características:
+# Trigger 1: trigger_check_nota_before_insert
+
+# Se ejecuta antes de una operación de inserción. --> BEFORE INSERT
+# Se ejecuta sobre la tabla alumnos. --> ON alumnos FOR EACH ROW
+# Si el nuevo valor de la nota que se quiere insertar es negativo, se guarda como 0.            -- INSTRUCCIONES
+# Si el nuevo valor de la nota que se quiere insertar es mayor que 10, se guarda como 10.
+
+DELIMITER $$;
+DROP TRIGGER IF EXISTS trigger_check_nota_before_insert;
+CREATE TRIGGER trigger_check_nota_before_insert
+BEFORE INSERT
+ON alumnos FOR EACH ROW
+BEGIN
+    IF NEW.nota < 0 THEN
+        SET NEW.nota = 0;
+    ELSEIF NEW.nota > 10 THEN
+        SET NEW.nota = 10;
+    end if ;
+end $$;
+
+# Una vez creados los triggers escriba varias sentencias de inserción y actualización sobre la tabla alumnos y verifica que los triggers se están ejecutando correctamente.
+    INSERT INTO alumnos VALUES (1, 'Juan Daniel', 'Delegado', 'Delegadez', -2);
+    INSERT INTO alumnos VALUES (2, 'Alejandro', 'Alejandrez', 'Bellingham', 7.2);
+    INSERT INTO alumnos VALUES (3, 'Ainara', 'Maligna', 'Reina', 17.2);
+    INSERT INTO alumnos VALUES (4, 'Robert', 'Subdelegado', 'Subdelegadez', -0.2);
+
+SELECT * FROM alumnos;
+
+
+# Trigger2 : trigger_check_nota_before_update
+# Se ejecuta sobre la tabla alumnos.
+# Se ejecuta antes de una operación de actualización.
+# Si el nuevo valor de la nota que se quiere actualizar es negativo, se guarda como 0.
+# Si el nuevo valor de la nota que se quiere actualizar es mayor que 10, se guarda como 10.
+DELIMITER $$;
+DROP TRIGGER IF EXISTS trigger_check_nota_before_update;
+CREATE TRIGGER trigger_check_nota_before_update
+BEFORE UPDATE
+ON alumnos FOR EACH ROW
+BEGIN
+        IF NEW.nota < 0 THEN
+        SET NEW.nota = 0;
+    ELSEIF NEW.nota > 10 THEN
+        SET NEW.nota = 10;
+    end if ;
+end $$;
+
+DELIMITER ;
+UPDATE alumnos SET nota = 15    where nombre = 'Robert';
+
+select * from alumnos;
+
