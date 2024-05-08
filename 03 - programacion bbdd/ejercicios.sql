@@ -598,42 +598,186 @@ SELECT es_par(21);
 # EJERCICIO 22
 # Escribe una función que devuelva el valor de la hipotenusa de un triángulo a partir de los valores de sus lados.
 
+DELIMITER $$;
+DROP FUNCTION IF EXISTS calcular_hipotenusa;
+CREATE FUNCTION calcular_hipotenusa(cateto1 DOUBLE, cateto2 DOUBLE)
+    RETURNS DOUBLE
+    NO SQL
+    BEGIN
+        DECLARE hipotenusa DOUBLE;
+        SET hipotenusa = SQRT(POW(cateto1, 2) + POW(cateto2, 2));
+        RETURN hipotenusa;
+    end $$;
 
-
+SELECT calcular_hipotenusa(3, 4);
 
 # EJERCICIO 23
 # Escribe una función que reciba como parámetro de entrada un valor numérico que represente un día de la semana y que devuelva una cadena de caracteres con el nombre del día de la semana correspondiente. Por ejemplo, para el valor de entrada 1 debería devolver la cadena lunes.
+DELIMITER $$;
+DROP FUNCTION IF EXISTS dia_semana;
+CREATE FUNCTION dia_semana(dia INT)
+RETURNS VARCHAR(10)
+NO SQL
+    BEGIN
+        DECLARE nombre_dia VARCHAR(10);
+        SET nombre_dia = CASE dia
+            WHEN 1 THEN 'lunes'
+            WHEN 2 THEN 'martes'
+            WHEN 3 THEN 'miércoles'
+            WHEN 4 THEN 'jueves'
+            WHEN 5 THEN 'viernes'
+            WHEN 6 THEN 'sábado'
+            WHEN 7 THEN 'domingo'
+            ELSE 'día no válido'
+        END;
+        RETURN nombre_dia;
+END $$;
+
+SELECT dia_semana(6);
 
 # EJERCICIO 24
 # Escribe una función que reciba tres números reales como parámetros de entrada y devuelva el mayor de los tres.
 
+ DELIMITER $$;
+    DROP FUNCTION IF EXISTS mayor_de_tres;
+    CREATE FUNCTION mayor_de_tres(a DOUBLE, b DOUBLE, c DOUBLE)
+        RETURNS DOUBLE
+        NO SQL
+        BEGIN
+            DECLARE mayor DOUBLE;
+            SET mayor = a;
+            IF b > mayor THEN
+                SET mayor = b;
+            END IF;
+            IF c > mayor THEN
+                SET mayor = c;
+            END IF;
+            RETURN mayor;
+        end $$;
+
+SELECT mayor_de_tres(3, 4, 5);
+SELECT mayor_de_tres(4, 3, 5);
+SELECT mayor_de_tres(5, 4, 3);
+
 # EJERCICIO 25
 # Escribe una función que devuelva el valor del área de un círculo a partir del valor del radio que se recibirá como parámetro de entrada.
+DELIMITER $$;
+DROP FUNCTION IF EXISTS calcular_area_circulo;
+CREATE FUNCTION calcular_area_circulo(radio DOUBLE)
+    RETURNS DOUBLE
+    NO SQL
+    BEGIN
+        DECLARE area DOUBLE;
+        SET area = PI() * POW(radio, 2);
+        RETURN area;
+    end $$;
+
+SELECT calcular_area_circulo(3);
 
 # EJERCICIO 26
 # Escribe una función que devuelva como salida el número de años que han transcurrido entre dos fechas que se reciben como parámetros de entrada. Por ejemplo, si pasamos como parámetros de entrada las fechas 2018-01-01 y 2008-01-01 la función tiene que devolver que han pasado 10 años.
 # Para realizar esta función puede hacer uso de las siguientes funciones que nos proporciona MySQL:
 # DATEDIFF
 # TRUNCATE
+DELIMITER $$;
+DROP FUNCTION IF EXISTS calcular_años;
+CREATE FUNCTION calcular_años(fecha1 DATE, fecha2 DATE)
+    RETURNS INT
+    NO SQL
+    BEGIN
+        DECLARE años INT;
+        SET años = TRUNCATE(DATEDIFF(fecha1, fecha2) / 365, 0); -- la función DATEDIFF calcula la diferencia, en días, entre dos fechas
+        RETURN años;                                            -- la función TRUNCATE redondea el resultado a los decimales que le indiquemos
+    end $$;
 
+SELECT calcular_años('2018-01-01', '2008-01-01');
 
 # EJERCICIO 27
 # Escribe una función que reciba una cadena de entrada y devuelva la misma cadena pero sin acentos. La función tendrá que reemplazar todas las vocales que tengan acento por la misma vocal pero sin acento. Por ejemplo, si la función recibe como parámetro de entrada la cadena María la función debe devolver la cadena Maria.
-
+DELIMITER $$;
+DROP FUNCTION IF EXISTS quitar_acentos;
+    CREATE FUNCTION quitar_acentos(cadena VARCHAR(100))
+        RETURNS VARCHAR(100)
+        NO SQL
+        BEGIN
+            DECLARE cadena_sin_acentos VARCHAR(100);
+            SET cadena_sin_acentos = REPLACE(cadena, 'á', 'a');
+            SET cadena_sin_acentos = REPLACE(cadena_sin_acentos, 'é', 'e');
+            SET cadena_sin_acentos = REPLACE(cadena_sin_acentos, 'í', 'i');
+            SET cadena_sin_acentos = REPLACE(cadena_sin_acentos, 'ó', 'o');
+            SET cadena_sin_acentos = REPLACE(cadena_sin_acentos, 'ú', 'u');
+            RETURN cadena_sin_acentos;
+        end $$;
 
 # 1.8.4 Funciones con sentencias SQL READS SQL DATA / MODIFIES SQL DATA
 
 # EJERCICIO 28
 # Escribe una función para la base de datos tienda que devuelva el número total de productos que hay en la tabla productos.
+USE jardineria;
+DELIMITER $$;
+DROP FUNCTION IF EXISTS total_productos;
+CREATE FUNCTION total_productos()
+    RETURNS INT
+    READS SQL DATA
+    BEGIN
+        DECLARE total INT;
+        SET total = (SELECT COUNT(*) FROM jardineria.producto);
+        RETURN total;
+    end $$;
+
+SELECT total_productos();
 
 # EJERCICIO 29
 # Escribe una función para la base de datos tienda que devuelva el valor medio del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+USE tienda;
+DELIMITER $$;
+DROP FUNCTION IF EXISTS precio_medio_fabricante;
+CREATE FUNCTION precio_medio_fabricante(fabricante_buscado VARCHAR(100))
+    RETURNS DECIMAL(10,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE precio_medio DECIMAL(10,2);
+        SET precio_medio = (SELECT AVG(precio)
+                            FROM producto p JOIN tienda.fabricante f on f.id = p.id_fabricante
+                            WHERE f.nombre = fabricante_buscado);
+        RETURN precio_medio;
+    end $$;
+
+SELECT precio_medio_fabricante('Asus');
 
 # EJERCICIO 30
 # Escribe una función para la base de datos tienda que devuelva el valor máximo del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+DELIMITER $$;
+DROP FUNCTION IF EXISTS precio_maximo_fabricante;
+CREATE FUNCTION precio_maximo_fabricante(fabricante_buscado VARCHAR(100))
+    RETURNS DECIMAL(10,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE precio_maximo DECIMAL(10,2);
+        SET precio_maximo = (SELECT MAX(precio)
+                            FROM producto p JOIN tienda.fabricante f on f.id = p.id_fabricante
+                            WHERE f.nombre = fabricante_buscado);
+        RETURN precio_maximo;
+    end $$;
+
+SELECT precio_maximo_fabricante('Asus');
 
 # EJERCICIO 31
 # Escribe una función para la base de datos tienda que devuelva el valor mínimo del precio de los productos de un determinado fabricante que se recibirá como parámetro de entrada. El parámetro de entrada será el nombre del fabricante.
+DELIMITER $$;
+DROP FUNCTION IF EXISTS precio_minimo_fabricante;
+CREATE FUNCTION precio_minimo_fabricante(fabricante_buscado VARCHAR(100))
+    RETURNS DECIMAL(10,2)
+    READS SQL DATA
+    BEGIN
+        DECLARE precio_minimo DECIMAL(10,2);
+        SET precio_minimo = (SELECT MIN(precio)
+                            FROM producto p JOIN tienda.fabricante f on f.id = p.id_fabricante
+                            WHERE f.nombre = fabricante_buscado);
+        RETURN precio_minimo;
+    end $$;
+
+SELECT precio_minimo_fabricante('Asus');
 
 # 1.8.8 Triggers
 
